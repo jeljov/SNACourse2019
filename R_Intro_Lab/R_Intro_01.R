@@ -259,7 +259,8 @@ ggplot(beatles, aes(x=Year, y=Duration)) + geom_point()
 beatles$rating <- sample(x = 1:5, size = nrow(beatles), replace = TRUE)
 
 # render a bar chart showing rating counts (= counts of songs with certain rating)
-ggplot(beatles, aes(x=rating)) + geom_bar()
+ggplot(beatles, aes(x=rating)) + geom_bar() +
+  expand_limits(x = 1:5)
 
 # render a bar chart for Year-Duration 
 ggplot(beatles, aes(x=Year, y=Duration)) + 
