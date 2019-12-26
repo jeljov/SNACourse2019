@@ -1,0 +1,8 @@
+The Art of R Programming, chapters 1-7
+https://www.oreilly.com/library/view/the-art-of/9781593273842/
+  
+Learning Statistics with R, chapters II and III
+https://learningstatisticswithr.com/
+  
+R for Psychological Science, chapters 1 (Core toolkit) and 2 (Working w/ data)
+https://psyr.org/
