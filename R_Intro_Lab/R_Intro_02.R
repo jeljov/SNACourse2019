@@ -2,19 +2,18 @@
 # Data sampling
 ###############################
   
-# create a vector with values from 1 to 10
+# create vector x with values from 1 to 10
 
 
 # create a sample of size 5 (without repetitions) from the vector x
 
 
-# create a sample of size 20 from the vector, where duplicates are allowed
+# create two samples of size 20 from the vector x, where duplicates are allowed
 
 
-# set seed and create two sample of size 20 from the vector, where duplicates are allowed
+# now, set the seed and again create two samples of size 20 from the vector x, 
+# with duplicates allowed
 
-
-# now, change the seed and repeat the sample creation
 
 
 ###############################
@@ -94,7 +93,7 @@
 # get names of the list elements
 
 
-# get elements with name 'country'
+# get elements with the given name (e.g. 'age')
 
 
 
@@ -173,10 +172,6 @@
 # get the number of characters in the titles of the first 10 songs
 
 
-# get the number of songs that were among the top 50 on billboard
-# (= have non-NA value for the Top.50.Billboard attribute)
-
-
 # compute the number of missing values for each attribute (column);
 # consider NA and empty string ("") as missing values
 
@@ -192,9 +187,6 @@
 # get the 4th element from the table
 
 
-# store the 4th element from the table in a variable
-
-
 # sort the table in the descending order
 
 
@@ -208,10 +200,11 @@
 # but limiting number of decimal points to 3
 
 
-# create a contingency table Top.50.Billboard vs. Year
+# create a contingency table for Top.50.Billboard vs. Year,
+# using the data for the first 20 songs; allow for NA values
 
 
-# alternative:
+# alternative (using xtabs):
 
 
 # again, we can compute proportions:
@@ -236,15 +229,16 @@
 # create a new data frame with two columns with randomly sampled data:
 # - Platinum - sample data from c(TRUE, FALSE)
 # - Score - sample data from the 5:10 range
+# the new data frame should have the same number of rows as the beatles data frame
 
 
-# combine two data frames
+# combine the two data frames
 
 
 # get the first song
 
 
-# add the song to the end of the data frame
+# add that song to the end of the data frame
 
 
 # add the song after the 3rd song in the data frame 
@@ -301,9 +295,6 @@
 # get titles of the songs from year 1964 not having McCartney as the only lead vocal
 
 
-# alternative:
-
-
 # get the songs from year 1964 not having McCartney as one of the lead vocals
 
 
@@ -312,6 +303,7 @@
 
 # create a vector of logical values denoting whether the attribute 
 # Album.debut has a value or not
+# Note: missing values are denoted here as empty strings ("")
 
 
 # compute the number of missing ("") values for Album.debut  
