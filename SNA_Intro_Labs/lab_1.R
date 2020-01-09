@@ -66,7 +66,7 @@ library(magrittr)
 # 1. LOADING NETWORK DATA
 ###
 
-# We will use the Krackhardt's High-tech Managers Networks dataset.
+# We will use David Krackhardt's High-tech Managers Networks dataset.
 # The data were collected from 21 management personnel in a high-tech, 
 # machine manufacturing firm to assess the effects of a recent 
 # management intervention program.
@@ -88,7 +88,7 @@ library(magrittr)
 # read.table() is a common R function for loading data from
 # files in which values are in tabular format. The function loads
 # the table into a data frame object. By default, R assumes that 
-# the table has no header and is delimited by any white space; 
+# the table has no header and the values are delimited by any white space; 
 # these settings are fine for our purposes here.
 #
 # One handy aspect of R is that you can read in data from a URL 
@@ -128,7 +128,6 @@ attributes <- read.csv('http://sna.stanford.edu/sna_R_labs/data/Krack-High-Tec-A
 
 # Check the structure and content of the attributes data frame
 str(attributes)
-summary(attributes)
 
 # The attributes set includes: 
 # - the actors' age (in years), 
@@ -136,6 +135,8 @@ summary(attributes)
 # - level in the corporate hierarchy; this is coded as follows: 
 #   1=CEO, 2 = Vice President, 3 = manager), 
 # - department, which is coded 1,2,3,4 with the CEO in department 0 ie not in a department
+
+summary(attributes)
 
 # Note that the summaries for the attributes LEVEL and DEPT do not
 # have much sense, as these are, in essence, factor variables, but
@@ -207,7 +208,7 @@ nrow(krack_full_nonzero_edges)
 # perform network analysis.
 krack_full <- graph_from_data_frame(krack_full_nonzero_edges) 
 summary(krack_full)
- 
+
 # By default, graph_from_data_frame() treats the first two columns 
 # of a data frame as an edge list and any remaining columns as 
 # edge attributes. Thus, the 232 edges appearing in the summary()
@@ -215,10 +216,20 @@ summary(krack_full)
 # any type of tie. The tie types themselves are listed as edge 
 # attributes.
 
+# To view the adjacency matrix of the graph:
+krack_full %>% as_adjacency_matrix()
+
+# The 'name' attribute should be of integer type so that
+# vertices are numbered in a more natural order. 
+# Let's change that:
+krack_full <- delete_vertex_attr(krack_full, 'name')
+V(krack_full)$name <- 1:vcount(krack_full)
+krack_full %>% as_adjacency_matrix()
+
 # Since we have node attributes, we can include them in the graph 
 # when creating the graph object.
 # To do that, we first need to add a column to the 'attributes' df 
-# to represent the nodes' 'names' (ie. values to be used for the 
+# to represent the nodes' 'names', (ie. values to be used for the 
 # node 'name' attribute in the graph). These names have to match 
 # the nodes' names in the edge list (ie. values of the 'ego' and
 # 'alter' columns in the krack_full_nonzero_edges df). Since in 
@@ -239,6 +250,11 @@ summary(krack_full)
 # Note that we now have 'age,' 'tenure,' 'level', and 'dept'
 # listed alongside 'name' as vertex attributes.
 
+# Since the 'name' attribute is again given as character
+# we'll replace its values with the corresponding integer
+# values:
+krack_full <- delete_vertex_attr(krack_full, 'name')
+V(krack_full)$name <- 1:vcount(krack_full)
 
 # We can get values for a given attribute for all of
 # the actors in the network - for example:
@@ -265,7 +281,7 @@ table(V(krack_full)$DEPT)
 V(krack_full)$AGE[V(krack_full)$DEPT == 2]
 
  
-# To get a vector of edges for a specific type of tie, use the 
+# To get a vector of edge values for a specific type of tie, use the 
 # edge_attr() function.
 edge_attr(krack_full, 'advice_tie')
 # Alternatively, it can be done as follows:
@@ -282,7 +298,8 @@ E(krack_full)$advice_tie %>% table() %>% prop.table()
 edge_attr(krack_full, 'friendship_tie')
 # alternative:
 E(krack_full)$friendship_tie
-# The proportion of friendship relations:
+# The proportion of friendship relations 
+# (among the three types of relations):
 E(krack_full)$friendship_tie %>% table() %>% prop.table()
 
 # And, to reports-to ties
@@ -439,8 +456,7 @@ dept_vertex_colors <- V(krack_full)$DEPT + 1
 # Select a color palette using the ColorBrewer (http://colorbrewer2.org) 
 colors <- c('#8dd3c7','#ffffb3','#bebada','#fb8072','#80b1d3')
 # Associate department numbers with colors from the 'colors' palette
-for(i in dept_vertex_colors)
-  dept_vertex_colors[dept_vertex_colors == i] = colors[i]
+dept_vertex_colors <- sapply(dept_vertex_colors, function(x) colors[x])
 
 jpeg("graphs/1.6_Krackhardt_Friendship_Color.jpg") 
 plot(krack_friendship, 
