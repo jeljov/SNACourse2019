@@ -22,6 +22,7 @@
 ###
 
 # Install and load the required libraries
+# install.packages('igraph')
 library(igraph)
 # install.packages('ggplot2')
 library(ggplot2)
@@ -32,9 +33,11 @@ library(tidyr)
 
 # Load the data, that is, the networks we created in Lab 1
 
+getwd()
 setwd("SNA_Intro_Labs")
 
 data_dir = "output/lab1/"
+paste0(data_dir, "krack_advice.RData")
 
 krack_advice <- readRDS(paste0(data_dir, "krack_advice.RData"))
 summary(krack_advice)
@@ -56,6 +59,7 @@ summary(krack_reports_to)
 
 # Compute indegree and outdegree for each node, 
 # first in the advice network
+?degree
 advice_deg_in <- degree(krack_advice, mode="in") 
 advice_deg_in
 table(advice_deg_in)
@@ -97,10 +101,11 @@ ggplot(data = deg_advice_df_long,
 
 # We can also make a plot (histogram) to examine degree distribution
 max_degree <- max(deg_advice_df_long$degree_value)
+
 ggplot(data = deg_advice_df_long, 
        mapping = aes(x = degree_value, fill = degree_type)) +
-  geom_histogram(bins = 15, position = 'dodge') +
-  # geom_density(alpha = 0.2) +
+  # geom_histogram(bins = 15, position = 'dodge') +
+  geom_density(alpha = 0.2) +
   labs(x = "Degree value", title = "Degree distribution for the Advice network") +
   scale_fill_discrete(name = "Degree type",
                       labels = c("In-degree", "Out-degree")) +
@@ -121,7 +126,7 @@ source('SNA_custom_functions.R')
 # there are different values in the given attribute 
 in_degree_colors = attr_based_color_gradient(g_attr = deg_advice_df$in_degree, 
                                              pal_end_points = c('grey100', 'red4'))
-
+in_degree_colors
 # Note: 
 # to select colors and find their names in R color pallets, you can use the
 # following R Colors cheatsheet:
@@ -174,14 +179,13 @@ table(E(krack_friendship_undirect)$friendship_tie)
 # in the network.
 is_connected(krack_friendship_undirect)
 
-closeness_friend_undirect <- closeness(krack_friendship_undirect, 
-                                       normalized = TRUE)
+?closeness
+closeness_friend_undirect <- closeness(krack_friendship_undirect)
 
-# Note that we are computing normalised closeness - this is becuase 
-# we will be interested in comparing closeness across the networks ->
-# whenever you want to compare a metric across networks, that metric
-# should be normalised, to account for the difference in the network 
-# sizes.
+# Note: 
+# whenever you want to compare a metric across networks (of different sizes),
+# that metric should be normalised (by setting normalized = TRUE), to account
+# for the difference in the network sizes.
 
 summary(closeness_friend_undirect)
 
@@ -192,7 +196,6 @@ summary(closeness_friend_undirect)
 # that is, lower distance. So, to appropriately calculate weighted closeness, it is 
 # better to take reciprocal value of the friendship_tie attribute:
 cl_weighted_friend_undirect <- closeness(krack_friendship_undirect, 
-                                         normalized = TRUE,
                                          weights = 1/E(krack_friendship_undirect)$friendship_tie)
 summary(cl_weighted_friend_undirect)
 
@@ -215,7 +218,6 @@ plot(krack_friendship_undirect,
      (node color denotes closeness, size denotes degree)")
 
 
-
 # Now, we move (go back) to directed network and compute in-closeness and 
 # out-closeness centrality.
 # You can think of in-closeness centrality as the average number of steps 
@@ -236,6 +238,12 @@ is.connected(krack_friendship, mode='strong')
 fr_components <- components(krack_friendship, mode = 'strong')
 str(fr_components)
 fr_components$membership
+# Observe components (and their members) by plotting the graph 
+plot(krack_friendship, 
+     layout=layout_nicely(krack_friendship), 
+     vertex.color = fr_components$membership,
+     edge.arrow.size = 0.3)
+
 # two nodes outside the giant component; get ids of those nodes
 not_in_gc <- which(fr_components$membership != 1)
 # create the giant component by removing these two nodes
@@ -245,8 +253,8 @@ is.connected(friendship_gc, mode='strong')
 # Now that we have a connected friendship (sub)graph, we can compute in- and
 # out-closeness
 friendship_closeness = data.frame(node_id=as.integer(V(friendship_gc)$name),
-                                  in_cl=closeness(friendship_gc, mode = 'in', normalized = TRUE),
-                                  out_cl=closeness(friendship_gc, mode = 'out', normalized = TRUE))
+                                  in_cl=closeness(friendship_gc, mode = 'in'),
+                                  out_cl=closeness(friendship_gc, mode = 'out'))
 str(friendship_closeness)
 
 # Let's visualise these measures using node and label size to represent in-closeness,
@@ -254,11 +262,11 @@ str(friendship_closeness)
 out_closeness_colors = attr_based_color_gradient(friendship_closeness$out_cl, 
                                                  c('grey100', 'red4'))
 plot(friendship_gc, 
-     layout=layout_with_kk(friendship_gc), 
+     layout=layout_nicely(friendship_gc), 
      vertex.color=out_closeness_colors, 
-     vertex.size=friendship_closeness$in_cl*30, # in-closeness is multiplied by 30 since in-closeness values are very small 
-     vertex.label.cex=friendship_closeness$in_cl*2, 
-     edge.arrow.size=.15,
+     vertex.size=friendship_closeness$in_cl*700, # in-closeness is multiplied by 700 since in-closeness values are very small 
+     vertex.label.cex=friendship_closeness$in_cl*50, 
+     edge.arrow.size=.20,
      main="Giant component of the Friendship network\n
             (node color denotes out-closeness, size denotes in-closeness)")
 
@@ -286,9 +294,9 @@ summary(betweenness(krack_friendship))
 
 # Compute betweeness for all the networks and store them in a data frame
 krack_betweenness_df = data.frame(node_id=as.integer(V(krack_advice)$name),
-                                  advice=betweenness(krack_advice, normalized = TRUE),
-                                  friendship=betweenness(krack_friendship, normalized = TRUE),
-                                  reports_to=betweenness(krack_reports_to, normalized = TRUE))
+                                  advice=betweenness(krack_advice),
+                                  friendship=betweenness(krack_friendship),
+                                  reports_to=betweenness(krack_reports_to))
 krack_betweenness_df
 
 # Identify the node with the highest betweenness in the advice network:
@@ -311,7 +319,6 @@ head(krack_betweenness_long)
 # of the 3 networks
 ggplot(data = krack_betweenness_long,
        mapping = aes(x = node_id, y = betweenness, fill = tie_type)) +
-  # geom_line() + geom_point() +
   geom_col(position = 'dodge') +
   labs(x = "Node ID", y = "Betweenness") +
   scale_fill_discrete(name = "Tie type") +
@@ -401,8 +408,8 @@ plot(krack_friendship,
 # To that end, we'll first construct a data frame with the vertices as rows 
 # and the centrality scores as columns:
 friendship_centrality_all <- data.frame(node_id=as.integer(V(krack_friendship)$name),
-                                        in_degree=degree(krack_friendship, mode = 'in', normalized = TRUE),
-                                        out_degree=degree(krack_friendship, mode = 'out', normalized = TRUE),
+                                        in_degree=degree(krack_friendship, mode = 'in'),
+                                        out_degree=degree(krack_friendship, mode = 'out'),
                                         betweenness=krack_betweenness_df$friendship,
                                         eigen=eigen_friend)
 View(friendship_centrality_all)
