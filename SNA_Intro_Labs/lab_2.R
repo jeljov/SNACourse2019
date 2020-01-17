@@ -377,10 +377,10 @@ summary(w_eigen_friend)
 eigen_col = attr_based_color_gradient(eigen_friend, c('grey100', 'red4'))
 
 plot(krack_friendship, 
-     layout=layout_with_fr(krack_friendship), 
+     layout=layout_nicely(krack_friendship), 
      vertex.color=eigen_col, 
-     vertex.size=krack_betweenness_df$friendship*75 + 5,
-     vertex.label.cex=krack_betweenness_df$friendship*5 + 0.5,
+     vertex.size=krack_betweenness_df$friendship * 0.1 + 5,
+     vertex.label.cex=krack_betweenness_df$friendship * 0.025 + 1,
      # vertex.size=degree(krack_friendship, normalized = TRUE) * 30,
      # vertex.label.cex=degree(krack_friendship, normalized = TRUE) * 3,
      edge.arrow.size=0.3,
