@@ -39,7 +39,7 @@
 # loading of packages has to be done in every session they are to be used
 # install.packages('cluster')
 # install.packages('lsa')
-# install.packages("animation", repos = "http://cran.cnr.berkeley.edu/", 
+# install.packages("animation", repos = "http://cran.cnr.berkeley.edu/",
 #                  dependencies = TRUE)
 # install.packages('NetData')
 
@@ -69,6 +69,10 @@ data(studentnets.M182, package = "NetData")
 # - social_df: observed social interactions, 
 # - task_df: observed task interactions
 #
+
+str(friend_df)
+table(friend_df$friend_tie)
+
 # All three dfs have the same structure:
 # - the first column is the ego, 
 # - the second column is the alter, 
@@ -79,12 +83,12 @@ data(studentnets.M182, package = "NetData")
 # There is also the 4th df - m182_full_data_frame - that
 # integrates data for the 3 abovementioned networks. 
 # As we won't need it for this lab, we'll remove it:
+str(m182_full_data_frame)
 remove(m182_full_data_frame)
 
 # Create graphs for the 3 different type of ties
 
 View(head(friend_df, 20))
-table(friend_df$friend_tie)
 # Notice many zeros (at least half tie values are zero); 
 # so, we'll first select only those rows of the df 
 # where ego and alter are connected through friend tie.
@@ -103,7 +107,6 @@ V(friend_net)$name <- sort(as.integer(V(friend_net)$name))
 View(head(social_df, 20))
 # Note: the weight in this network is the estimated number of 
 # social interactions per hour.
-summary(social_df$social_tie)
 social_net <- graph_from_data_frame(subset(social_df, social_tie > 0))
 summary(social_net)
 V(social_net)$name # correct name order, no need for a change
@@ -111,7 +114,6 @@ V(social_net)$name # correct name order, no need for a change
 View(head(task_df, 20))
 # Note: the weight in this network is the estimated number of 
 # task-related interactions per hour.
-summary(task_df$task_tie)
 task_net <- graph_from_data_frame(subset(task_df, task_tie > 0))
 summary(task_net)
 V(task_net)$name # correct name order, no need to change
@@ -252,12 +254,12 @@ cross_community_edges
 # We can detect brokers by visualizing a network using 
 # - node size to denote betweenness centrality, 
 # - node color to mark community membership, and
-# - node color to mark cross community edges:
+# - edge color to mark cross community edges:
 edge_color <- rep('steelblue4', times=ecount(friend_net_und))
 edge_color[cross_community_edges] <- 'firebrick4'
 set.seed(seed)
 plot(friend_net_und, 
-     layout=layout_with_kk(friend_net_und),
+     layout=layout_with_fr(friend_net_und),
      vertex.color=membership(friend_comm_eb),
      vertex.size=betweenness(friend_net_und, directed = FALSE) * 5,
      vertex.label.cex=betweenness(friend_net_und, directed = FALSE) * 0.25,
